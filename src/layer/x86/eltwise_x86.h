@@ -12,30 +12,19 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef LAYER_CONVOLUTION_x86_H
-#define LAYER_CONVOLUTION_x86_H
+#ifndef LAYER_ELTWISE_x86_H
+#define LAYER_ELTWISE_x86_H
 
-#include "convolution.h"
+#include "eltwise.h"
 
 namespace ncnn {
 
-class Convolution_x86 : public Convolution
+class Eltwise_x86 : public Eltwise
 {
 public:
-    virtual int load_param(const ParamDict& pd);
-
-#if NCNN_STDIO
-    virtual int load_model(FILE* binfp);
-#endif // NCNN_STDIO
-    virtual int load_model(const unsigned char*& mem);
-
-    virtual int forward(const Mat& bottom_blob, Mat& top_blob) const;
-
-public:
-    bool use_winograd3x3;
-    Mat weight_3x3_winograd64_data;
+    virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs) const;
 };
 
 } // namespace ncnn
 
-#endif // LAYER_CONVOLUTION_x86_H
+#endif // LAYER_ELTWISE_x86_H

@@ -12,7 +12,11 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#include "convolution_x86.h"
+#include "convolutiondepthwise_x86.h"
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 namespace ncnn {
 
@@ -23,67 +27,16 @@ namespace ncnn {
 #include "convolution_5x5.h"
 #include "convolution_7x7.h"
 
-DEFINE_LAYER_CREATOR(Convolution_x86)
+DEFINE_LAYER_CREATOR(ConvolutionDepthWise_x86)
 
-int Convolution_x86::load_param(const ParamDict& pd)
-{
-    int ret = Convolution::load_param(pd);
-    if (ret != 0)
-        return ret;
-
-    use_winograd3x3 = false;
-
-    if (kernel_size == 3 && dilation == 1 && stride == 1)
-    {
-        int num_input = weight_data_size / 9 / num_output;
-        // winograd is slow on small channel count
-        if (num_input >= 16 && num_output >= 16)
-            use_winograd3x3 = true;
-    }
-
-    return 0;
-}
-
-#if NCNN_STDIO
-int Convolution_x86::load_model(FILE* binfp)
-{
-    int ret = Convolution::load_model(binfp);
-    if (ret != 0)
-        return ret;
-
-    if (use_winograd3x3)
-    {
-        int num_input = weight_data_size / 9 / num_output;
-        conv3x3s1_winograd64_transform_kernel_sse(weight_data, weight_3x3_winograd64_data, num_input, num_output);
-    }
-
-    return 0;
-}
-#endif // NCNN_STDIO
-
-int Convolution_x86::load_model(const unsigned char*& mem)
-{
-    int ret = Convolution::load_model(mem);
-    if (ret != 0)
-        return ret;
-
-    if (use_winograd3x3)
-    {
-        int num_input = weight_data_size / 9 / num_output;
-        conv3x3s1_winograd64_transform_kernel_sse(weight_data, weight_3x3_winograd64_data, num_input, num_output);
-    }
-
-    return 0;
-}
-
-int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
+int ConvolutionDepthWise_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
 {
     // convolv with NxN kernel
     // value = value + bias
 
     if (kernel_size > 7 || stride > 4 || dilation != 1)
     {
-        return Convolution::forward(bottom_blob, top_blob);
+        return ConvolutionDepthWise::forward(bottom_blob, top_blob);
     }
 
     typedef void (*conv_func)(const Mat&, Mat&, const Mat&, const Mat&);
@@ -138,7 +91,7 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
     conv_func conv = conv_func_table[kernel_size-1][stride-1];
     if (!conv)
     {
-        return Convolution::forward(bottom_blob, top_blob);
+        return ConvolutionDepthWise::forward(bottom_blob, top_blob);
     }
 
     int w = bottom_blob.w;
@@ -177,10 +130,49 @@ int Convolution_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
     if (top_blob.empty())
         return -100;
 
-    if (use_winograd3x3)
-        conv3x3s1_winograd64_sse(bottom_blob_bordered, top_blob, weight_3x3_winograd64_data, bias_data);
-    else
-        conv(bottom_blob_bordered, top_blob, weight_data, bias_data);
+    const int maxk = kernel_size * kernel_size;
+
+    // depth-wise
+    if (channels == group && group == num_output)
+    {
+#ifdef _OPENMP
+        int nested_current = omp_get_nested();
+        omp_set_nested(0);
+#endif
+
+        #pragma omp parallel for
+        for (int g=0; g<group; g++)
+        {
+            Mat bottom_blob_bordered_g = bottom_blob_bordered.channel(g);
+            Mat top_blob_g = top_blob.channel(g);
+            Mat weight_data_g(maxk, (float*)(weight_data + maxk * g));
+            Mat bias_data_g;
+            if (bias_term)
+                bias_data_g = Mat(1, (float*)(bias_data + g));
+
+            conv(bottom_blob_bordered_g, top_blob_g, weight_data_g, bias_data_g);
+        }
+
+#ifdef _OPENMP
+        omp_set_nested(nested_current);
+#endif
+        return 0;
+    }
+
+    const int channels_g = channels / group;
+    const int num_output_g = num_output / group;
+
+    for (int g=0; g<group; g++)
+    {
+        Mat bottom_blob_bordered_g(w, h, channels_g, bottom_blob_bordered.channel(channels_g * g));
+        Mat top_blob_g(outw, outh, num_output_g, top_blob.channel(num_output_g * g));
+        Mat weight_data_g(maxk * channels_g * num_output_g, (float*)(weight_data + maxk * channels_g * num_output_g * g));
+        Mat bias_data_g;
+        if (bias_term)
+            bias_data_g = Mat(num_output_g, (float*)(bias_data + num_output_g * g));
+
+        conv(bottom_blob_bordered_g, top_blob_g, weight_data_g, bias_data_g);
+    }
 
     return 0;
 }
