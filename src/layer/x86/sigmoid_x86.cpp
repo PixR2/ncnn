@@ -15,11 +15,11 @@
 #include "sigmoid_x86.h"
 
 #if __SSE3__
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 #include "sse_mathfun.h"
 #endif // __SSE3__
 
-#include <math.h>
+#include <cmath>
 
 namespace ncnn {
 

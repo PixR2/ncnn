@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <sys/time.h>
 #include <opencv2/core/core.hpp>

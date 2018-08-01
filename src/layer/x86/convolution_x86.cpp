@@ -14,6 +14,10 @@
 
 #include "convolution_x86.h"
 
+#if __SSE3__
+#include "NEON_2_SSE.h"
+#endif // __SSE3__
+
 namespace ncnn {
 
 #include "convolution_1x1.h"

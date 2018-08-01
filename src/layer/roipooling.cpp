@@ -13,7 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "roipooling.h"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 namespace ncnn {

@@ -140,6 +140,7 @@ ncnn_add_layer(Interp)
 
 add_library(ncnn STATIC ${ncnn_SRCS})
 
+
 install(TARGETS ncnn ARCHIVE DESTINATION lib)
 install(FILES
     blob.h

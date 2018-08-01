@@ -13,7 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "lrn_arm.h"
-#include <math.h>
+#include <cmath>
 
 #if __ARM_NEON
 #include <arm_neon.h>

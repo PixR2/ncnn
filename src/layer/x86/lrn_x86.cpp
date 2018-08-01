@@ -13,10 +13,10 @@
 // specific language governing permissions and limitations under the License.
 
 #include "lrn_x86.h"
-#include <math.h>
+#include <cmath>
 
 #if __SSE3__
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 #include "sse_mathfun.h"
 #endif // __SSE3__
 

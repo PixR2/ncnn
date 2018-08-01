@@ -12,10 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#if __SSE3__
-#include <NEON_2_SSE.h>
-#endif // __SSE3__
-
 static void conv1x1s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _kernel, const Mat& _bias)
 {
     int w = bottom_blob.w;
@@ -82,26 +78,26 @@ static void conv1x1s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _ker
                 float32x4_t _outp = vld1q_f32(outptr);
                 float32x4_t _outpn = vld1q_f32(outptr+4);
 
-                _outp = vfmaq_f32(_outp, _p, _k0);
-                _outpn = vfmaq_f32(_outpn, _pn, _k0);
+                _outp = vmlaq_f32(_outp, _p, _k0);
+                _outpn = vmlaq_f32(_outpn, _pn, _k0);
 
                 float32x4_t _p1 = vld1q_f32(r1);
                 float32x4_t _p1n = vld1q_f32(r1+4);
 
-                _outp = vfmaq_f32(_outp, _p1, _k1);
-                _outpn = vfmaq_f32(_outpn, _p1n, _k1);
+                _outp = vmlaq_f32(_outp, _p1, _k1);
+                _outpn = vmlaq_f32(_outpn, _p1n, _k1);
 
                 float32x4_t _p2 = vld1q_f32(r2);
                 float32x4_t _p2n = vld1q_f32(r2+4);
 
-                _outp = vfmaq_f32(_outp, _p2, _k2);
-                _outpn = vfmaq_f32(_outpn, _p2n, _k2);
+                _outp = vmlaq_f32(_outp, _p2, _k2);
+                _outpn = vmlaq_f32(_outpn, _p2n, _k2);
 
                 float32x4_t _p3 = vld1q_f32(r3);
                 float32x4_t _p3n = vld1q_f32(r3+4);
 
-                _outp = vfmaq_f32(_outp, _p3, _k3);
-                _outpn = vfmaq_f32(_outpn, _p3n, _k3);
+                _outp = vmlaq_f32(_outp, _p3, _k3);
+                _outpn = vmlaq_f32(_outpn, _p3n, _k3);
 
                 vst1q_f32(outptr, _outp);
                 vst1q_f32(outptr+4, _outpn);
@@ -161,8 +157,8 @@ static void conv1x1s1_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _ker
                 float32x4_t _pn = vld1q_f32(r0+4);
                 float32x4_t _outpn = vld1q_f32(outptr+4);
 
-                _outp = vfmaq_f32(_outp, _p, _k0);
-                _outpn = vfmaq_f32(_outpn, _pn, _k0);
+                _outp = vmlaq_f32(_outp, _p, _k0);
+                _outpn = vmlaq_f32(_outpn, _pn, _k0);
 
                 vst1q_f32(outptr, _outp);
                 vst1q_f32(outptr+4, _outpn);

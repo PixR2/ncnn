@@ -62,7 +62,7 @@
 #include <nmmintrin.h> //SSE4.2
 #endif
 
-#include <math.h>
+#include <cmath>
 
 //***************  functions and data attributes, compiler dependent  *********************************
 //***********************************************************************************
@@ -71,9 +71,9 @@
 #define _NEON2SSE_ALIGN_16  __attribute__((aligned(16)))
 #define _NEON2SSE_INLINE extern inline __attribute__((__gnu_inline__, __always_inline__, __artificial__))
 #if _GCC_VERSION <  40500
-    #define _NEON2SSE_PERFORMANCE_WARNING(function, explanation)   __attribute__((deprecated)) function
+    #define _NEON2SSE_PERFORMANCE_WARNING(function, explanation)   function
 #else
-    #define _NEON2SSE_PERFORMANCE_WARNING(function, explanation)   __attribute__((deprecated(explanation))) function
+    #define _NEON2SSE_PERFORMANCE_WARNING(function, explanation)   function
 #endif
 #if defined(__x86_64__)
     #define _NEON2SSE_64BIT  __x86_64__
@@ -898,6 +898,8 @@ uint8x8_t vpadd_u8(uint8x8_t a, uint8x8_t b); // VPADD.I8 d0,d0,d0
 uint16x4_t vpadd_u16(uint16x4_t a, uint16x4_t b); // VPADD.I16 d0,d0,d0
 uint32x2_t vpadd_u32(uint32x2_t a, uint32x2_t b); // VPADD.I32 d0,d0,d0
 float32x2_t vpadd_f32(float32x2_t a, float32x2_t b); // VPADD.F32 d0,d0,d0
+float32x4_t vpaddq_f32(float32x4_t a, float32x4_t b); // VPADD.F32 d0,d0,d0
+float32_t vaddvq_f32(float32x4_t v);
 //Long pairwise add
 int16x4_t vpaddl_s8(int8x8_t a); // VPADDL.S8 d0,d0
 int32x2_t vpaddl_s16(int16x4_t a); // VPADDL.S16 d0,d0
@@ -1838,6 +1840,7 @@ int32x4_t vmlaq_lane_s32(int32x4_t a, int32x4_t b, int32x2_t v, __constrange(0,1
 uint16x8_t vmlaq_lane_u16(uint16x8_t a, uint16x8_t b, uint16x4_t v, __constrange(0,3) int l); // VMLA.I16 q0,q0, d0[0]
 uint32x4_t vmlaq_lane_u32(uint32x4_t a, uint32x4_t b, uint32x2_t v, __constrange(0,1) int l); // VMLA.I32 q0,q0, d0[0]
 float32x4_t vmlaq_lane_f32(float32x4_t a, float32x4_t b, float32x2_t v, __constrange(0,1) int l); // VMLA.F32 q0,q0, d0[0]
+float32x4_t vmlaq_laneq_f32(float32x4_t a, float32x4_t b, float32x4_t v, __constrange(0,1) int l); // VMLA.F32 q0,q0, d0[0]
 //Vector widening multiply accumulate with scalar
 int32x4_t vmlal_lane_s16(int32x4_t a, int16x4_t b, int16x4_t v, __constrange(0,3) int l); //VMLAL.S16 q0, d0,d0[0]
 int64x2_t vmlal_lane_s32(int64x2_t a, int32x2_t b, int32x2_t v, __constrange(0,1) int l); //VMLAL.S32 q0, d0,d0[0]
@@ -6345,6 +6348,25 @@ _NEON2SSE_INLINE float32x2_t vpadd_f32(float32x2_t a, float32x2_t b)
     hadd128 = _mm_shuffle_ps (hadd128, hadd128, _MM_SHUFFLE(3,1, 2, 0)); //use low 64 bits
     _M64f(res64, hadd128);
     return res64;
+}
+
+float32x4_t vpaddq_f32(float32x4_t a, float32x4_t b); // VPADD.F32 d0,d0,d0
+_NEON2SSE_INLINE float32x4_t vpaddq_f32(float32x4_t a, float32x4_t b)
+{
+    return _mm_hadd_ps(_pM128(a), _pM128(b));
+}
+
+float32_t vaddvq_f32(float32x4_t v);
+_NEON2SSE_INLINE float32_t vaddvq_f32(float32x4_t v)
+{
+    union {
+        __m128 v;    
+        float a[4];  
+    } converter;
+    converter.v = _mm_hadd_ps(v, v);
+    converter.v = _mm_hadd_ps(converter.v, converter.v);
+    
+    return converter.a[0];
 }
 
 
@@ -13361,6 +13383,21 @@ _NEON2SSE_INLINE float32x4_t vmlaq_lane_f32(float32x4_t a, float32x4_t b, float3
     float32_t vlane;
     float32x4_t c;
     vlane = vget_lane_f32(v, l);
+    c = vdupq_n_f32(vlane);
+    return vmlaq_f32(a,b,c);
+}
+
+float32x4_t vfmaq_laneq_f32(float32x4_t a, float32x4_t b, float32x4_t v, __constrange(0,3) int l); // VMLA.F32 q0, q0, d0[0]
+_NEON2SSE_INLINE float32x4_t vfmaq_laneq_f32(float32x4_t a, float32x4_t b, float32x4_t v, __constrange(0,3) int l) // VMLA.F32 q0, q0, d0[0]
+{
+    float32_t vlane;
+    float32x4_t c;
+    union {
+        __m128 v;    
+        float a[4];  
+    } converter;
+    converter.v = v;
+    vlane = converter.a[l];
     c = vdupq_n_f32(vlane);
     return vmlaq_f32(a,b,c);
 }

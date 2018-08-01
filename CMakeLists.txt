@@ -37,6 +37,9 @@ add_definitions(-fPIC)
 add_definitions(-Ofast)
 
 add_definitions(-ffast-math)
+add_definitions(-msse)
+add_definitions(-Wall)
+
 # add_definitions(-march=native)
 
 # add_definitions(-flto)
@@ -54,6 +57,10 @@ elseif(IOS)
 endif()
 
 ##############################################
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(examples)
 add_subdirectory(mtcnn)

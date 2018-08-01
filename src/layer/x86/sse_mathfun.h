@@ -25,7 +25,7 @@
  *  (this is the zlib license)
  */
 
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 
 #define c_inv_mant_mask ~0x7f800000u
 #define c_cephes_SQRTHF 0.707106781186547524

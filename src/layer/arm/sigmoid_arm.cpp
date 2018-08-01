@@ -19,7 +19,7 @@
 #include "neon_mathfun.h"
 #endif // __ARM_NEON
 
-#include <math.h>
+#include <cmath>
 
 namespace ncnn {
 

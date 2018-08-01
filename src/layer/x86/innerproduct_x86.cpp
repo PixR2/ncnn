@@ -15,7 +15,7 @@
 #include "innerproduct_x86.h"
 
 #if __SSE3__
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 #endif // __SSE3__
 
 namespace ncnn {
@@ -69,11 +69,11 @@ int InnerProduct_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
             {
                 float32x4_t _m = vld1q_f32(m);
                 float32x4_t _w = vld1q_f32(w);
-                _sum = vfmaq_f32(_sum, _m, _w);
+                _sum = vmlaq_f32(_sum, _m, _w);
 
                 _m = vld1q_f32(m + 4);
                 _w = vld1q_f32(w + 4);
-                _sum2 = vfmaq_f32(_sum2, _m, _w);
+                _sum2 = vmlaq_f32(_sum2, _m, _w);
 
                 m += 8;
                 w += 8;

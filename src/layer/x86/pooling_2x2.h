@@ -12,10 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#if __SSE3__
-#include <NEON_2_SSE.h>
-#endif // __SSE3__
-
 static void pooling2x2s2_max_sse(const Mat& bottom_blob, Mat& top_blob)
 {
     int w = bottom_blob.w;
@@ -55,7 +51,7 @@ static void pooling2x2s2_max_sse(const Mat& bottom_blob, Mat& top_blob)
                 float32x4_t _max0 = vmaxq_f32(_r00, _r10);
                 float32x4_t _max1 = vmaxq_f32(_r01, _r11);
 
-                float32x4_t _max = vpmaxq_f32(_max0, _max1);
+                float32x4_t _max = _mm_max_ps(_max0, _max1);
 
                 vst1q_f32(outptr, _max);
 

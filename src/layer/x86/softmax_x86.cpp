@@ -14,10 +14,10 @@
 
 #include "softmax_x86.h"
 #include <float.h>
-#include <math.h>
+#include <cmath>
 
 #if __SSE3__
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 #include "sse_mathfun.h"
 #endif // __SSE3__
 
@@ -134,7 +134,7 @@ int Softmax_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
             float32x4_t _p = vld1q_f32(outptr);
             float32x4_t _sum = vld1q_f32(sumptr);
 
-            _p = vdivq_f32(_p, _sum);
+            _p = _mm_div_ps(_p, _sum);
             vst1q_f32(outptr, _p);
 
             outptr += 4;
@@ -279,7 +279,7 @@ int Softmax_x86::forward_inplace(Mat& bottom_top_blob) const
             float32x4_t _p = vld1q_f32(ptr);
             float32x4_t _sum = vld1q_f32(sumptr);
 
-            _p = vdivq_f32(_p, _sum);
+            _p = _mm_div_ps(_p, _sum);
             vst1q_f32(ptr, _p);
 
             ptr += 4;

@@ -15,7 +15,7 @@
 #include "reduction.h"
 #include <float.h>
 #include <limits.h>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <functional>
 

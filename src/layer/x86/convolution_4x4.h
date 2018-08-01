@@ -12,10 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#if __SSE3__
-#include <NEON_2_SSE.h>
-#endif // __SSE3__
-
 static void conv4x4s4_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _kernel, const Mat& _bias)
 {
     int w = bottom_blob.w;
@@ -102,20 +98,20 @@ static void conv4x4s4_sse(const Mat& bottom_blob, Mat& top_blob, const Mat& _ker
                     float32x4_t _sum2 = vmulq_f32(_r02, _k0123);
                     float32x4_t _sum3 = vmulq_f32(_r03, _k0123);
 
-                    _sum0 = vfmaq_f32(_sum0, _r10, _k4567);
-                    _sum1 = vfmaq_f32(_sum1, _r11, _k4567);
-                    _sum2 = vfmaq_f32(_sum2, _r12, _k4567);
-                    _sum3 = vfmaq_f32(_sum3, _r13, _k4567);
+                    _sum0 = vmlaq_f32(_sum0, _r10, _k4567);
+                    _sum1 = vmlaq_f32(_sum1, _r11, _k4567);
+                    _sum2 = vmlaq_f32(_sum2, _r12, _k4567);
+                    _sum3 = vmlaq_f32(_sum3, _r13, _k4567);
 
-                    _sum0 = vfmaq_f32(_sum0, _r20, _k891011);
-                    _sum1 = vfmaq_f32(_sum1, _r21, _k891011);
-                    _sum2 = vfmaq_f32(_sum2, _r22, _k891011);
-                    _sum3 = vfmaq_f32(_sum3, _r23, _k891011);
+                    _sum0 = vmlaq_f32(_sum0, _r20, _k891011);
+                    _sum1 = vmlaq_f32(_sum1, _r21, _k891011);
+                    _sum2 = vmlaq_f32(_sum2, _r22, _k891011);
+                    _sum3 = vmlaq_f32(_sum3, _r23, _k891011);
 
-                    _sum0 = vfmaq_f32(_sum0, _r30, _k12131415);
-                    _sum1 = vfmaq_f32(_sum1, _r31, _k12131415);
-                    _sum2 = vfmaq_f32(_sum2, _r32, _k12131415);
-                    _sum3 = vfmaq_f32(_sum3, _r33, _k12131415);
+                    _sum0 = vmlaq_f32(_sum0, _r30, _k12131415);
+                    _sum1 = vmlaq_f32(_sum1, _r31, _k12131415);
+                    _sum2 = vmlaq_f32(_sum2, _r32, _k12131415);
+                    _sum3 = vmlaq_f32(_sum3, _r33, _k12131415);
 
                     float32x4_t _s01 = vpaddq_f32(_sum0, _sum1);
                     float32x4_t _s23 = vpaddq_f32(_sum2, _sum3);

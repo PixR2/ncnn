@@ -13,7 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "rnn.h"
-#include <math.h>
+#include <cmath>
 
 namespace ncnn {
 

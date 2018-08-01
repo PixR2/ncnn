@@ -12,10 +12,6 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#if __SSE3__
-#include <NEON_2_SSE.h>
-#endif // __SSE3__
-
 static void pooling3x3s2_max_sse(const Mat& bottom_blob, Mat& top_blob)
 {
     int w = bottom_blob.w;

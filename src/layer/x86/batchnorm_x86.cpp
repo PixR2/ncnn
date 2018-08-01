@@ -15,7 +15,7 @@
 #include "batchnorm_x86.h"
 
 #if __SSE3__
-#include <NEON_2_SSE.h>
+#include "NEON_2_SSE.h"
 #endif // __SSE3__
 
 namespace ncnn {
@@ -61,7 +61,7 @@ int BatchNorm_x86::forward(const Mat& bottom_blob, Mat& top_blob) const
         {
             float32x4_t _p = vld1q_f32(ptr);
             float32x4_t _outp = _a;
-            _outp = vfmaq_f32(_outp, _p, _b);
+            _outp = vmlaq_f32(_outp, _p, _b);
             vst1q_f32(outptr, _outp);
 
             ptr += 4;
@@ -114,7 +114,7 @@ int BatchNorm_x86::forward_inplace(Mat& bottom_top_blob) const
         {
             float32x4_t _p = vld1q_f32(ptr);
             float32x4_t _outp = _a;
-            _outp = vfmaq_f32(_outp, _p, _b);
+            _outp = vmlaq_f32(_outp, _p, _b);
             vst1q_f32(ptr, _outp);
 
             ptr += 4;

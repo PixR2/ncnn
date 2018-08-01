@@ -13,7 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "unaryop.h"
-#include <math.h>
+#include <cmath>
 #include <functional>
 
 namespace ncnn {
