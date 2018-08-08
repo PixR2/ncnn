@@ -37,7 +37,7 @@ add_definitions(-fPIC)
 add_definitions(-Ofast)
 
 add_definitions(-ffast-math)
-add_definitions(-msse)
+add_definitions(-msse4)
 add_definitions(-Wall)
 
 # add_definitions(-march=native)

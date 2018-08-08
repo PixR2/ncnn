@@ -513,46 +513,46 @@ static void conv3x3s1_winograd64_sse(const Mat& bottom_blob, Mat& top_blob, cons
                 // tile
                 for (int i=0; i<h_tm/8 * w_tm/8; i++)
                 {
-#if __SSE3__
-                    for (int m=0; m+7<64; m+=8)
-                    {
-                        float32x4_t _output0_tm = vld1q_f32(output0_tm);
+// #if __SSE3__
+//                     for (int m=0; m+7<64; m+=8)
+//                     {
+//                         float32x4_t _output0_tm = vld1q_f32(output0_tm);
 
-                        float32x4_t _r0 = vld1q_f32(r0);
-                        float32x4_t _r1 = vld1q_f32(r1);
-                        float32x4_t _r2 = vld1q_f32(r2);
-                        float32x4_t _r3 = vld1q_f32(r3);
+//                         float32x4_t _r0 = vld1q_f32(r0);
+//                         float32x4_t _r1 = vld1q_f32(r1);
+//                         float32x4_t _r2 = vld1q_f32(r2);
+//                         float32x4_t _r3 = vld1q_f32(r3);
 
-                        float32x4_t _k0 = vld1q_f32(k0);
-                        float32x4_t _k1 = vld1q_f32(k1);
-                        float32x4_t _k2 = vld1q_f32(k2);
-                        float32x4_t _k3 = vld1q_f32(k3);
+//                         float32x4_t _k0 = vld1q_f32(k0);
+//                         float32x4_t _k1 = vld1q_f32(k1);
+//                         float32x4_t _k2 = vld1q_f32(k2);
+//                         float32x4_t _k3 = vld1q_f32(k3);
 
-                        _output0_tm = vmlaq_f32(_output0_tm, _r0, _k0);
-                        _output0_tm = vmlaq_f32(_output0_tm, _r1, _k1);
-                        _output0_tm = vmlaq_f32(_output0_tm, _r2, _k2);
-                        _output0_tm = vmlaq_f32(_output0_tm, _r3, _k3);
+//                         _output0_tm = vmlaq_f32(_output0_tm, _r0, _k0);
+//                         _output0_tm = vmlaq_f32(_output0_tm, _r1, _k1);
+//                         _output0_tm = vmlaq_f32(_output0_tm, _r2, _k2);
+//                         _output0_tm = vmlaq_f32(_output0_tm, _r3, _k3);
 
-                        vst1q_f32(output0_tm, _output0_tm);
+//                         vst1q_f32(output0_tm, _output0_tm);
 
-                        output0_tm += 4;
+//                         output0_tm += 4;
 
-                        r0 += 4;
-                        r1 += 4;
-                        r2 += 4;
-                        r3 += 4;
+//                         r0 += 4;
+//                         r1 += 4;
+//                         r2 += 4;
+//                         r3 += 4;
 
-                        k0 += 4;
-                        k1 += 4;
-                        k2 += 4;
-                        k3 += 4;
-                    }
+//                         k0 += 4;
+//                         k1 += 4;
+//                         k2 += 4;
+//                         k3 += 4;
+//                     }
 
-                    k0 -= 64;
-                    k1 -= 64;
-                    k2 -= 64;
-                    k3 -= 64;
-#else
+//                     k0 -= 64;
+//                     k1 -= 64;
+//                     k2 -= 64;
+//                     k3 -= 64;
+// #else
                     for (int m=0; m<64; m++)
                     {
                         output0_tm[m] += r0[m] * k0[m];
@@ -566,7 +566,7 @@ static void conv3x3s1_winograd64_sse(const Mat& bottom_blob, Mat& top_blob, cons
                     r2 += 64;
                     r3 += 64;
                     output0_tm += 64;
-#endif // __SSE3__
+// #endif // __SSE3__
                 }
             }
 
